@@ -35,7 +35,7 @@ def generate_launch_description():
         DeclareLaunchArgument('namespace', default_value='fer'),
         DeclareLaunchArgument('isSim', default_value='true'),
         DeclareLaunchArgument('simTimeScale', default_value='1.0'),
-        DeclareLaunchArgument('robot_ip', default_value='172.16.0.2'),
+        DeclareLaunchArgument('robot_ip', default_value='130.251.6.11'),
         DeclareLaunchArgument('with_gripper', default_value='true'),
         DeclareLaunchArgument('rviz', default_value='false'),
         DeclareLaunchArgument('with_tcp', default_value='false'),

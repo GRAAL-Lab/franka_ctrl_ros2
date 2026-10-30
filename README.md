@@ -10,7 +10,6 @@ The two controller configurations are:
 
 - [kcl_fer.conf](fer_ctrl/conf/kcl_fer.conf): tasks, activation parameters, gains,
   saturations, priority levels, actions, state/action mappings, and park/unpark postures.
-  It uses the same libconfig structure as Undroid's `kcl_undroid.conf`.
 - [dcl_fer.conf](fer_ctrl/conf/dcl_fer.conf): computed-torque or joint-impedance
   control, joint gains, reference velocity/acceleration/jerk limits, torque limits,
   and torque-rate limits.
@@ -44,7 +43,7 @@ The simulator uses the same dynamic-controller library.
 | `fer_bringup` | Complete hardware/simulation launch and RViz configuration |
 
 Headers and implementations are separated into `include/<package>/` and
-`src/<package>/`. Commands and states follow Undroid's `GenericCommand` and
+`src/<package>/`. Commands and states follow a `GenericCommand` and
 `GenericState` organization. `InitializeROSInterfaces` creates node interfaces,
 `Handle...` methods process messages or services, `Run` advances one cycle,
 and `Publish...` methods publish results. The core creates tasks in `CreateTasks`
@@ -141,21 +140,42 @@ ros2 launch fer_bringup fer.launch.py \
 The same `dcl_config` is passed to the dynamic node and selected backend.
 Configuration files are loaded at startup; restart the stack after changing them.
 
-Bringup controls simulation globally with `isSim` (default `true`) and
-`simTimeScale` (default `1.0`):
+### Real-time and simulated-time options
+
+Bringup controls the backend and clock mode with `isSim` (default `true`).
+`isSim:=true` launches the simulator; `isSim:=false` selects the hardware backend.
+The simulation speed is controlled by `simTimeScale` (default `1.0`):
 
 ```bash
+# Simulation at twice the target real-time speed:
 ros2 launch fer_bringup fer.launch.py isSim:=true simTimeScale:=2.0
+# Hardware:
+ros2 launch fer_bringup fer.launch.py isSim:=false robot_ip:=130.251.6.11
+# Hardware without the Franka hand:
+ros2 launch fer_bringup fer.launch.py isSim:=false robot_ip:=130.251.6.11 with_gripper:=false
 ```
 
-The simulator publishes the shared ROS `/clock`. Physics, gripper motion,
-controller updates, action transitions, watchdogs and message timestamps follow
-that clock. `simTimeScale:=2.0` targets twice real-time speed by scheduling fixed
-numerical steps more frequently. The integration step stays the same; achieved
-speed depends on available CPU. The scale must be finite and positive.
-`isSim:=false` selects the hardware backend and system time. For nodes started
-individually, pass `-p isSim:=true` to the controllers and visualizer to follow
-the simulator's clock. The simulator itself defaults to simulation mode.
+`use_sim_time` and `get_clock()` are ROS 2-provided mechanisms; the application
+does not implement its own clock selection. A ROS 2 node has a ROS clock, which
+is what `get_clock()` returns. When the node's built-in `use_sim_time` parameter
+is `true`, ROS 2 makes that clock follow messages on `/clock`. When it is
+`false`, the ROS clock uses system time and ignores `/clock`.
+
+In this stack, `isSim` sets `use_sim_time` for the controllers and visualizer.
+The Kinematic Controller creates its periodic timer using `get_clock()`, so the
+timer is driven by ROS time: in simulation it follows `/clock`; in hardware mode
+it follows system time. The simulator is the `/clock` publisher; the hardware
+driver does not publish that topic. For nodes started individually, pass
+`-p isSim:=true` to the controllers and visualizer to follow the simulator's
+clock. The simulator itself defaults to simulation mode.
+
+`simTimeScale` changes how quickly the simulator publishes clock advances in
+wall time, not the simulated time step size. Each simulator tick advances ROS
+time by `1 / loop_rate` seconds, and the wall-timer period between ticks is
+`1 / (loop_rate * simTimeScale)` seconds. Consequently, a ROS-time controller
+timer configured for a fixed simulated-time period is scheduled more often per
+wall-clock second as the simulation scale increases. This is a target speed and
+depends on the machine keeping up. The scale must be finite and positive.
 
 The simulator's `tool_offset` parameter sets the flange-to-tool distance in metres.
 It defaults to `fer::DEFAULT_TOOL_OFFSET` in `fer_model/franka_arm_model.hpp`; set
@@ -164,12 +184,6 @@ use this shared default. The controller takes the actual tool
 transform from driver or simulator feedback.
 
 Hardware:
-
-```bash
-ros2 launch fer_bringup fer.launch.py isSim:=false robot_ip:=172.16.0.2
-# Without the Franka hand:
-ros2 launch fer_bringup fer.launch.py isSim:=false robot_ip:=172.16.0.2 with_gripper:=false
-```
 
 Activate FCI and unlock the brakes in Franka Desk before enabling.
 `enable` starts torque control; `disable` decelerates the joint reference and
@@ -242,7 +256,7 @@ ros2 launch fer_bringup fer.launch.py with_tcp:=true tcp_port:=9999
 ```
 
 The default address is `127.0.0.1`; `tcp_host` selects another address.
-The C++ bridge follows Undroid's protocol/parser/command-loop/feedback-loop
+The C++ bridge follows a protocol/parser/command-loop/feedback-loop
 organization. Its installed [armprotocol.h](fer_tcp_bridge/include/fer_tcp_bridge/armprotocol.h)
 defines command IDs, reports and packed structures. Each packet contains three
 little-endian `uint32` fields (`destination`, `msgId`, payload `length`), followed

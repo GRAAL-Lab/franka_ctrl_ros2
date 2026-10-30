@@ -32,9 +32,7 @@ def generate_launch_description():
             output='screen',
             parameters=[
                 LaunchConfiguration('controller_config'),
-                {
-                    'configuration_file': LaunchConfiguration('kcl_config'),
-                },
+                {'configuration_file': LaunchConfiguration('kcl_config'),},
                 simulation_parameters,
             ],
         ),

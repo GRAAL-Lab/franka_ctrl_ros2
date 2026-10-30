@@ -211,7 +211,7 @@ class SimulationTest(unittest.TestCase):
         self.until(lambda: self.control.ctrl_state == 'parked', timeout=20.0)
         self.assertFalse(self.command('move_joint_i_vel', joint_setpoint=[0.1]).success)
 
-        # The simulated driver keeps Undroid's joint-position exception in parked.
+        # The simulated driver keeps joint-position exception in parked.
         self.assertTrue(self.command('move_joint_i_pos', joint_index=0, joint_setpoint=[0.02],
                                      move_type='relative').success)
         self.until(lambda: self.control.ctrl_state == 'move_joints_pos')

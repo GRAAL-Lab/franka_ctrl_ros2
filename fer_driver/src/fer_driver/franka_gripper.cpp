@@ -11,7 +11,7 @@ namespace fer {
 FrankaGripper::FrankaGripper()
     : Node("gripper_node")
 {
-    gripper_ = std::make_unique<franka::Gripper>(declare_parameter("robot_ip", "172.16.0.2"));
+    gripper_ = std::make_unique<franka::Gripper>(declare_parameter("robot_ip", "130.251.6.11"));
     callbackGroup_ = create_callback_group(rclcpp::CallbackGroupType::Reentrant);
     gripperStatePub_ = create_publisher<fer_msgs::msg::GripperState>(topicnames::gripper_state, 1);
     commandService_ = create_service<fer_msgs::srv::DriverCommand>(topicnames::gripper_command,

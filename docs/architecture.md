@@ -1,7 +1,6 @@
 # FER control architecture
 
-The implementation follows Undroid's command/state/task organization and Ulisse's
-ROS2 package and node layout.
+The implementation follows a command/state/task organization ROS2 package and node layout.
 
 ## Components
 
@@ -83,7 +82,7 @@ Each command and state has a header and implementation file under
 before changing `RobotInfo`. The FSM controls allowed commands and transitions;
 states select configured actions and update task references.
 
-The control timer follows Undroid's order: `SwitchState`, `ProcessEventQueue`,
+The control timer follows the order: `SwitchState`, `ProcessEventQueue`,
 then `ExecuteState`, followed by task updates and the solver. Accepted commands
 schedule transitions for the next timer call. Transitions requested by a state's
 `Execute` method take effect on the following call. Driver faults and feedback
@@ -92,8 +91,8 @@ failures still stop control immediately.
 Idle accepts all commands subject to feedback and driver checks. Joint-position,
 joint-velocity and Cartesian motion states accept replacement motion commands
 and park. Parking and unparking accept stop, disable and Franka recovery only;
-motion commands are rejected. Unpark is allowed from idle or parked. As in
-Undroid, `isSim=true` additionally permits joint-position commands
+motion commands are rejected. Unpark is allowed from idle or parked.
+`isSim=true` additionally permits joint-position commands
 from parked. Bringup passes its global `isSim` argument to the controllers;
 standalone `control.launch.py` defaults it to false. Self-transitions are not registered;
 updating a goal in the current motion state does not run its entry hook again.
@@ -245,7 +244,7 @@ use the same normal/offset geometry as the selected KCL configuration.
 `FrankaTCPBridge` contains an `ArmCommandParser` and independent 100 Hz command
 and feedback timers. It buffers incomplete TCP frames and partial writes, bounds
 pending service requests and output queues, and accepts reconnections. The
-packed `ArmProtocol` header retains Undroid's command IDs and payload framing;
+packed `ArmProtocol` header uses command IDs and payload framing;
 FER joint arrays contain exactly seven entries. Reports stream asynchronously
 from ROS feedback. The parser translates binary commands into the same ROS2
 service used by ROS2 clients and RViz. `dummy_client_node` monitors this protocol

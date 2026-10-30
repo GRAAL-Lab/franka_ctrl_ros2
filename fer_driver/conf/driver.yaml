@@ -1,6 +1,6 @@
 /**:
   ros__parameters:
-    robot_ip: "172.16.0.2"
+    robot_ip: "130.251.6.11"
     command_timeout: 0.20
     publish_rate: 100.0
     enforce_realtime: true

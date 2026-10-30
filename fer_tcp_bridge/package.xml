@@ -2,7 +2,7 @@
 <package format="3">
     <name>fer_tcp_bridge</name>
     <version>0.1.0</version>
-    <description>Undroid-style C++ binary TCP command and feedback bridge for FER.</description>
+    <description>C++ binary TCP command and feedback bridge for Franka Emika Robot.</description>
     <maintainer email="francesco.wanderlingh@unige.it">Francesco Wanderlingh</maintainer>
     <license>MIT</license>
     <buildtool_depend>ament_cmake</buildtool_depend>

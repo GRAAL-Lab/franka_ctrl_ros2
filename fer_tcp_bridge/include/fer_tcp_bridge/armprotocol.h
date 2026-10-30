@@ -9,7 +9,7 @@
 #include <string>
 
 /**
- * @brief Packed Undroid-compatible binary commands and reports.
+ * @brief Packed binary commands and reports.
  * @details Native little-endian integers and IEEE doubles, without padding. Lengths
  * exclude the 12-byte header. Positions use metres, angles radians and joints zero-based indices.
  * Numeric identifiers and field order form the wire ABI and must remain stable.
@@ -69,7 +69,7 @@ enum RptMsgId : uint32_t {
     MAX_RPT_MSG_ID
 };
 
-// Undroid framing: native little-endian integers/doubles, with no struct padding.
+// Native little-endian integers/doubles, with no struct padding.
 // length is the payload size, excluding the 12-byte header. Angles use radians.
 #pragma pack(push, 1)
 /** @brief Common wire header: destination, message identifier and payload byte count. */
@@ -131,7 +131,7 @@ struct GripperMove {
 /** @brief Grasp request with force in newtons. */
 struct GripperGrasp {
     ArmProtocolHeader header;
-    double force; // Franka grasp force in N; Undroid used a motor-current threshold.
+    double force; // Franka grasp force in N;
 };
 /** @brief Controller state report. */
 struct ArmStatus {
@@ -142,7 +142,7 @@ struct ArmStatus {
 struct JointsPosition {
     ArmProtocolHeader header;
     double q1, q2, q3, q4, q5, q6, q7;
-    double pincers; // Opening percentage, as in Undroid.
+    double pincers; // Opening percentage.
 };
 /** @brief Measured base-frame tool position in metres and RPY orientation in radians. */
 struct EffectorPosition {

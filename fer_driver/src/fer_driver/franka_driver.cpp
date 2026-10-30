@@ -34,7 +34,7 @@ void FrankaDriver::LoadConfiguration()
 {
     std::string defaultFile = ament_index_cpp::get_package_share_directory("fer_ctrl") + "/conf/dcl_fer.conf";
     configuration_.LoadConfiguration(declare_parameter("dynamic_configuration_file", defaultFile));
-    robotAddress_ = declare_parameter("robot_ip", "172.16.0.2");
+    robotAddress_ = declare_parameter("robot_ip", "130.251.6.11");
     baseFrame_ = declare_parameter("base_frame", "panda_link0");
     commandTimeout_ = declare_parameter("command_timeout", 0.2);
     publishRate_ = declare_parameter("publish_rate", 100.0);
