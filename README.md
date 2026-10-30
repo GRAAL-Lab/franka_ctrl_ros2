@@ -140,6 +140,24 @@ ros2 launch fer_bringup fer.launch.py \
 The same `dcl_config` is passed to the dynamic node and selected backend.
 Configuration files are loaded at startup; restart the stack after changing them.
 
+**Hardware**:
+
+Activate FCI and unlock the brakes in Franka Desk before enabling.
+`enable` starts torque control; `disable` decelerates the joint reference and
+ends the session. These commands do not operate power or brakes.
+After `disable`, the controller inhibits motion immediately and enters
+`disabling`. Fresh driver feedback confirming `control_active = false` completes
+the transition to `disabled`. If confirmation does not arrive within
+`disableTimeout` (default 5 seconds in `fer_ctrl/conf/kcl_fer.conf`), it enters `fault`.
+`recover` requests `automaticErrorRecovery()` after control has stopped.
+Connection failures require restarting the driver. Recovery and reconnection
+never resume an old motion.
+
+ROS parameters for frames and driver/simulator settings remain in
+`fer_ctrl/conf/controller.yaml`, `fer_driver/conf/driver.yaml`, and
+`fer_sim/conf/simulator.yaml`. Top-level launch also accepts `controller_config`,
+`driver_config`, `simulator_config`, and `namespace` (default `fer`).
+
 ### Real-time and simulated-time options
 
 Bringup controls the backend and clock mode with `isSim` (default `true`).
@@ -182,24 +200,6 @@ It defaults to `fer::DEFAULT_TOOL_OFFSET` in `fer_model/franka_arm_model.hpp`; s
 `tool_offset` in the simulator YAML to override it. All `FrankaArmModel` instances
 use this shared default. The controller takes the actual tool
 transform from driver or simulator feedback.
-
-Hardware:
-
-Activate FCI and unlock the brakes in Franka Desk before enabling.
-`enable` starts torque control; `disable` decelerates the joint reference and
-ends the session. These commands do not operate power or brakes.
-After `disable`, the controller inhibits motion immediately and enters
-`disabling`. Fresh driver feedback confirming `control_active = false` completes
-the transition to `disabled`. If confirmation does not arrive within
-`disableTimeout` (default 5 seconds in `fer_ctrl/conf/kcl_fer.conf`), it enters `fault`.
-`recover` requests `automaticErrorRecovery()` after control has stopped.
-Connection failures require restarting the driver. Recovery and reconnection
-never resume an old motion.
-
-ROS parameters for frames and driver/simulator settings remain in
-`fer_ctrl/conf/controller.yaml`, `fer_driver/conf/driver.yaml`, and
-`fer_sim/conf/simulator.yaml`. Top-level launch also accepts `controller_config`,
-`driver_config`, `simulator_config`, and `namespace` (default `fer`).
 
 ## Commands and monitoring
 
