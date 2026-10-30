@@ -158,6 +158,12 @@ ROS parameters for frames and driver/simulator settings remain in
 `fer_sim/conf/simulator.yaml`. Top-level launch also accepts `controller_config`,
 `driver_config`, `simulator_config`, and `namespace` (default `fer`).
 
+The simulator's `tool_offset` parameter sets the flange-to-tool distance in metres.
+It defaults to `fer::DEFAULT_TOOL_OFFSET` in `fer_model/franka_arm_model.hpp`; set
+`tool_offset` in the simulator YAML to override it. All `FrankaArmModel` instances
+use this shared default. The controller takes the actual tool
+transform from driver or simulator feedback.
+
 ### Real-time and simulated-time options
 
 Bringup controls the backend and clock mode with `isSim` (default `true`).
@@ -194,12 +200,6 @@ time by `1 / loop_rate` seconds, and the wall-timer period between ticks is
 timer configured for a fixed simulated-time period is scheduled more often per
 wall-clock second as the simulation scale increases. This is a target speed and
 depends on the machine keeping up. The scale must be finite and positive.
-
-The simulator's `tool_offset` parameter sets the flange-to-tool distance in metres.
-It defaults to `fer::DEFAULT_TOOL_OFFSET` in `fer_model/franka_arm_model.hpp`; set
-`tool_offset` in the simulator YAML to override it. All `FrankaArmModel` instances
-use this shared default. The controller takes the actual tool
-transform from driver or simulator feedback.
 
 ## Commands and monitoring
 
